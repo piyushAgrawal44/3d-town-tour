@@ -3,7 +3,7 @@ import { FBXLoader } from 'three-stdlib';
 import * as THREE from 'three';
 import { useEffect, useRef } from 'react';
 
-export default function FBXModel({ path, setHoverInfo, scale, setIsDialogOpen }: { path: string, setHoverInfo: any, scale: number, setIsDialogOpen: any }) {
+export default function FBXModel({ path, setHoverInfo, scale, setIsDialogOpen, setModelCenter }: { path: string, setHoverInfo: any, scale: number, setIsDialogOpen: any, setModelCenter: any }) {
     const fbx = useLoader(FBXLoader, path);
     const groupRef = useRef<THREE.Group>(null);
     const raycaster = useRef(new THREE.Raycaster());
@@ -48,6 +48,13 @@ export default function FBXModel({ path, setHoverInfo, scale, setIsDialogOpen }:
             mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
             mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
         };
+
+        const box = new THREE.Box3().setFromObject(fbx);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+
+        console.log("House size:", size);    // e.g. { x: 12, y: 8, z: 15 }
+        console.log("House center:", center); // Target this for camera
         gl.domElement.addEventListener('dblclick', handleDoubleClick);
         gl.domElement.addEventListener('mousemove', handleMouseMove);
         return () => {
@@ -86,6 +93,14 @@ export default function FBXModel({ path, setHoverInfo, scale, setIsDialogOpen }:
                 hoveredMeshRef.current = null;
                 setHoverInfo(null);
             }
+        }
+
+        // Send center back
+        if (groupRef.current && setModelCenter) {
+            const box = new THREE.Box3().setFromObject(groupRef.current);
+            const center = new THREE.Vector3();
+            box.getCenter(center);
+            setModelCenter(center);
         }
     });
 

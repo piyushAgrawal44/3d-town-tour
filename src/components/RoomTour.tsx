@@ -126,9 +126,10 @@ const RoomTour = () => {
 
     // ✅ Floor circles
     const circlePositions: [number, number, number][] = [
-        [-85, 22, -5],
+        [-80, 2, 55],
         [-80, 2, -55],
         [105, 2, 5],
+        [-10, 3, -35],
 
     ];
 
@@ -165,10 +166,11 @@ const RoomTour = () => {
 
                     <OrbitControls
                         ref={controlsRef}
+                        target={[-50, 30, 0]}
                         minDistance={10}
                         maxDistance={100}
-                        minPolarAngle={Math.PI / 2.8}
-                        maxPolarAngle={Math.PI / 2.8}
+                        minPolarAngle={Math.PI / 2}
+                        maxPolarAngle={Math.PI / 2}
                     />
 
                     <CameraController direction={""} controlsRef={controlsRef} />

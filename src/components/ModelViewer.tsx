@@ -60,7 +60,7 @@ function CityScene() {
   return (
     <primitive
       object={scene}
-      scale={[0.5, 0.5, 0.5]}     // ⬅️ Tune this
+      scale={0.7}     // ⬅️ Tune this
       position={[37, 0, -20]}      // ⬅️ Tune this
       rotation={[0, Math.PI, 0]}   // ⬅️ Optional: Adjust orientation
     />
@@ -73,6 +73,7 @@ export default function ModelViewer() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [houseCenter, setHouseCenter] = useState<THREE.Vector3 | null>(null);
 
   const cameraRef = useRef<any>(null!);
   useEffect(() => {
@@ -95,18 +96,27 @@ export default function ModelViewer() {
   };
 
   const setFrontView = () => {
-    if (cameraRef.current) {
-      cameraRef.current.position.set(5, 50, 20); // Front view
-      cameraRef.current.lookAt(0, 0, 0);
+    if (cameraRef.current && houseCenter) {
+      cameraRef.current.position.set(
+        houseCenter.x,
+        houseCenter.y + 20,
+        houseCenter.z + 20
+      );
+      cameraRef.current.lookAt(houseCenter);
     }
   };
 
   const setBackView = () => {
-    if (cameraRef.current) {
-      cameraRef.current.position.set(0, 50, -20); // Back view
-      cameraRef.current.lookAt(0, 0, 0);
+    if (cameraRef.current && houseCenter) {
+      cameraRef.current.position.set(
+        houseCenter.x,
+        houseCenter.y + 50,
+        houseCenter.z - 20
+      );
+      cameraRef.current.lookAt(houseCenter);
     }
   };
+
 
   return (
     <>
@@ -130,7 +140,7 @@ export default function ModelViewer() {
       <Canvas onCreated={({ camera }) => {
         setIsLoading(false);
         cameraRef.current = camera;
-      }} camera={{ position: [5, 50, 20], fov: 50 }}>
+      }} camera={{ position: [7.914999511718749, 2, 30], fov: 50 }}>
         <Sky distance={450000} sunPosition={[5, 1, 8]} inclination={0} azimuth={0.25} />
         <Grass />
         <CityScene />
@@ -139,14 +149,15 @@ export default function ModelViewer() {
         <Environment preset="city" background />
 
 
-        <FBXModel path="/models/house.fbx" scale={0.001} setHoverInfo={setHoverInfo} setIsDialogOpen={setIsDialogOpen} />
+        <FBXModel setModelCenter={setHouseCenter} path="/models/house.fbx" scale={0.001} setHoverInfo={setHoverInfo} setIsDialogOpen={setIsDialogOpen} />
 
         <OrbitControls
-          minPolarAngle={Math.PI / 2.15}
-          maxPolarAngle={Math.PI / 2.15}
+          target={[7.914999511718749, 2, 6.989999877929686]}
+          minPolarAngle={Math.PI / 2}
+          maxPolarAngle={Math.PI / 2}
           enableZoom={true}
           enablePan={false}
-          minDistance={4}
+          minDistance={15}
           maxDistance={50}
           screenSpacePanning={true}
           rotateSpeed={0.5}
